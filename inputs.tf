@@ -6,10 +6,6 @@ variable "frontend_version" {
   type = string
 }
 
-variable "integration_version" {
-  type = string
-}
-
 variable "test_number" {
   type = number
 }

@@ -16,7 +16,7 @@ resource "kubernetes_pod" "integration" {
 
     container {
       name    = "cypress"
-      image   = "hsndocker/integration-cypress:${var.integration_version}"
+      image   = "hsndocker/integration-cypress:latest"
       # command = ["/bin/bash", "-c", "sleep infinity"]
 
       resources {
