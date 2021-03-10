@@ -26,7 +26,7 @@ resource "kubernetes_pod" "integration" {
         }
 
         requests = {
-          memory = "512Mi"
+          memory = "1024Mi"
           cpu    = "1200m"
         }
       }
