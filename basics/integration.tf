@@ -114,7 +114,7 @@ resource "kubernetes_pod" "integration" {
     container {
       name    = "backend"
       image   = "hsndocker/backend:${var.backend_version}"
-      command = ["/bin/bash", "-c", "rm manage.py && mv manage.integration.py manage.py && rm engineerx/wsgi.py && mv engineerx/wsgi.integration.py engineerx/wsgi.py && ./start.sh"]
+      command = ["/bin/bash", "-c", "rm manage.py && mv manage.integration.py manage.py && rm engineerx/wsgi.py && mv engineerx/wsgi.integration.py engineerx/wsgi.py && ./start.sh && python manage.py initdb"]
 
       port {
         container_port = 8000
@@ -129,6 +129,26 @@ resource "kubernetes_pod" "integration" {
             key  = "password"
           }
         }
+      }
+
+      env {
+        name  = "INITDB_USERS_SIZE"
+        value = 5
+      }
+
+      env {
+        name  = "INITDB_EDITORS_SIZE"
+        value = 5
+      }
+
+      env {
+        name  = "INITDB_MODERATORS_SIZE"
+        value = 5
+      } 
+
+      env {
+        name  = "INITDB_POSTS_SIZE"
+        value = 5
       }
 
       resources {
