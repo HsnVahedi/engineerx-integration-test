@@ -1,6 +1,6 @@
 resource "kubernetes_secret" "postgres_password" {
   metadata {
-    name      = "postgres-password-${var.test_number}"
+    name      = "postgres-password-${var.test_name}-${var.test_number}"
     namespace = "integration-test"
     labels = {
       role = "integration"
@@ -14,7 +14,7 @@ resource "kubernetes_secret" "postgres_password" {
 
 resource "kubernetes_secret" "dockerhub_cred" {
   metadata {
-    name = "dockerhub-cred"
+    name = "dockerhub-cred-${var.test_name}-${var.test_number}"
     namespace = "integration-test"
     labels = {
       role = "integration"

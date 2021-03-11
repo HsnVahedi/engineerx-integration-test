@@ -10,6 +10,10 @@ variable "test_number" {
   type = number
 }
 
+variable "test_name" {
+  type = string 
+}
+
 variable "dockerhub_username" {
   type = string 
 }

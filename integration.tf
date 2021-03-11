@@ -1,6 +1,6 @@
 resource "kubernetes_pod" "integration" {
   metadata {
-    name      = "integration-${var.test_number}"
+    name      = "integration-${var.test_name}-${var.test_number}"
     namespace = "integration-test"
 
     labels = {
