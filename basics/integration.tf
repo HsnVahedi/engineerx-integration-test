@@ -63,7 +63,7 @@ resource "kubernetes_pod" "integration" {
           port = "3000"
         }
 
-        initial_delay_seconds = 300
+        initial_delay_seconds = 500
         period_seconds        = 5
       }
 
@@ -73,7 +73,7 @@ resource "kubernetes_pod" "integration" {
           port = "3000"
         }
 
-        initial_delay_seconds = 300
+        initial_delay_seconds = 500
         period_seconds        = 5
       }
 
