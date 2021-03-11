@@ -26,13 +26,11 @@ pipeline {
             }
         } 
         stage('Deploy Integration Tests') {
-	    stage("Basics Init") {
+	    steps {
            	dir("basics") {
 		    sh '../terraform init'
 		}
-	    }
-	    stage("Empty Database Init") {
-           	dir("basics") {
+		dir("emptydb") {
 		    sh '../terraform init'
 		}
 	    }
