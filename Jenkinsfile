@@ -17,15 +17,14 @@ pipeline {
     }
     stages {
         stage('Configure kubectl and terraform') {
-            
             steps {
                 sh 'cd /root && cp -r .kubecopy .kube'
                 sh 'cd /root/.kube && rm config && mv minikube.config config'
                 sh 'cp /root/terraform/terraform .'
                 sh 'cp /root/kubectl/kubectl .'
             }
-        } 
-        stage('Deploy Integration Tests') {
+        }
+	stage('Terraform Initialization') {
 	    steps {
            	dir("basics") {
 		    sh '../terraform init'
@@ -34,6 +33,8 @@ pipeline {
 		    sh '../terraform init'
 		}
 	    }
+	}
+        stage('Deploy Integration Tests') {
             parallel {
                 stage("Basics") {
                     steps {
