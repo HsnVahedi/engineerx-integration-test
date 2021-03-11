@@ -33,8 +33,8 @@ pipeline {
         stage('Deploy Integration Tests') {
             parallel {
                 stage("Basics") {
-                    dir('basics') {
-                    	steps {
+                    steps {
+                    	dir('basics') {
 			    sh "./terraform init"
                             sh('./terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
                             sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
@@ -43,15 +43,17 @@ pipeline {
                         }
 			post {
                             always {
-                            	sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                            }
+				dir('basics') {
+				    sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+				}
+                            	                            }
                     	}
                     }
                     
                 }
                 stage("Empy Database") {
-                    dir('emptydb') {
-                    	steps {
+                    steps {
+                    	dir('emptydb') {
 			    sh "./terraform init"
                             sh('./terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
                             sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
@@ -59,8 +61,10 @@ pipeline {
                         }
 			post {
                        	    always {
-                            	sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                       	    }
+				dir('emptydb') {
+				    sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+				}
+                            	                       	    }
                     	}
                     }
                     
