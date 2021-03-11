@@ -29,11 +29,13 @@ pipeline {
             parallel {
                 stage("Basics") {
                     steps {
-                        sh './terraform init'
-                        sh('./terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                        sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
-                        sh "./kubectl exec -n integration-test integration-basics-${env.BUILD_ID} -c backend -- python manage.py initdb"
-                        sh "./kubectl exec -n integration-test integration-basics-${env.BUILD_ID} -c cypress -- npx cypress run --spec cypress/integration/basics_spec.js --config-file cypress.integration.json"
+                        dir('basics') {
+                            sh './terraform init'
+                            sh('./terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+                            sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
+                            sh "./kubectl exec -n integration-test integration-basics-${env.BUILD_ID} -c backend -- python manage.py initdb"
+                            sh "./kubectl exec -n integration-test integration-basics-${env.BUILD_ID} -c cypress -- npx cypress run --spec cypress/integration/basics_spec.js --config-file cypress.integration.json"
+                        }
                     }
                     post {
                         always {
@@ -43,10 +45,12 @@ pipeline {
                 }
                 stage("Empy Database") {
                     steps {
-                        sh './terraform init'
-                        sh('./terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                        sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
-                        sh "./kubectl exec -n integration-test integration-emptydb-${env.BUILD_ID} -c cypress -- npx cypress run --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json"
+                        dir('emptydb') {
+                            sh './terraform init'
+                            sh('./terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+                            sh "./kubectl wait --for=condition=ready --timeout=600s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
+                            sh "./kubectl exec -n integration-test integration-emptydb-${env.BUILD_ID} -c cypress -- npx cypress run --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json"
+                        }
                     }
                     post {
                         always {
