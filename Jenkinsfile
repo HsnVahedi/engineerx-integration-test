@@ -11,6 +11,7 @@ pipeline {
     }
     environment {
         DOCKERHUB_CRED = credentials('dockerhub-repo')
+        CYPRESS_KEY = credentials('cypress-key')
         BACKEND_VERSION = "${params.BACKEND_VERSION}"
         FRONTEND_VERSION = "${params.FRONTEND_VERSION}"
         BUILD_ID = "${env.BUILD_ID}"
@@ -47,7 +48,7 @@ pipeline {
                     	dir('basics') {
                             sh('./terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
                             sh "./kubectl wait --for=condition=ready --timeout=1500s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
-                            sh "./kubectl exec -n integration-test integration-basics-${env.BUILD_ID} -c cypress -- npx cypress run --record --key 58e3a76b-f6a4-43ec-a12b-eac81cfbe294 --spec cypress/integration/basics_spec.js --config-file cypress.integration.json"
+                            sh('./kubectl exec -n integration-test integration-basics-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/basics_spec.js --config-file cypress.integration.json')
                         }	
                     }
 		            post {
@@ -63,7 +64,7 @@ pipeline {
                     	dir('emptydb') {
                             sh('./terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
                             sh "./kubectl wait --for=condition=ready --timeout=1500s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
-                            sh "./kubectl exec -n integration-test integration-emptydb-${env.BUILD_ID} -c cypress -- npx cypress run --record --key 58e3a76b-f6a4-43ec-a12b-eac81cfbe294 --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json"
+                            sh('./kubectl exec -n integration-test integration-emptydb-$env.BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json')
                         }
                     }
                     post {
