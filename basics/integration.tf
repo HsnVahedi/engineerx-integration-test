@@ -114,7 +114,7 @@ resource "kubernetes_pod" "integration" {
     container {
       name    = "backend"
       image   = "hsndocker/backend:${var.backend_version}"
-      command = ["/bin/bash", "-c", "rm manage.py && mv manage.integration.py manage.py && rm engineerx/wsgi.py && mv engineerx/wsgi.integration.py engineerx/wsgi.py && ./start.sh && python manage.py initdb"]
+      command = ["/bin/bash", "-c", "rm manage.py && mv manage.integration.py manage.py && rm engineerx/wsgi.py && mv engineerx/wsgi.integration.py engineerx/wsgi.py && ./start.sh"]
 
       port {
         container_port = 8000
