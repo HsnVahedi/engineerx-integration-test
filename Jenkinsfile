@@ -17,6 +17,18 @@ pipeline {
         BUILD_ID = "${env.BUILD_ID}"
     }
     stages {
+        stage('Providing Access Keys') {
+            steps {
+                sh('aws configure set aws_access_key_id $ACCESS_KEY_ID')
+                sh('aws configure set aws_secret_access_key $SECRET_KEY')
+                sh('aws configure set default.region $REGION')
+            }
+        }
+        stage('Setting kubeconfig') {
+            steps {
+                sh('aws eks --region $REGION update-kubeconfig --name $CLUSTER_NAME')
+            }
+        }
         stage('Terraform Initialization') {
             steps {
                 dir('basics') {
