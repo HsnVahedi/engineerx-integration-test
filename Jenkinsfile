@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'hsndocker/cluster-control:latest'
-            args '-u root:root -v /home/hossein/.kube:/root/.kubecopy:ro -v /home/hossein/.minikube:/root/.minikube:ro'
+            image 'hsndocker/aws-cli:latest'
+            args '-u root:root'
         }
     }
     parameters {
@@ -17,27 +17,13 @@ pipeline {
         BUILD_ID = "${env.BUILD_ID}"
     }
     stages {
-        stage('Configure kubectl and terraform') {
-            steps {
-
-                sh 'cd /root && cp -r .kubecopy .kube'
-                sh 'cd /root/.kube && rm config && mv minikube.config config'
-
-                sh 'cp /root/terraform/terraform basics/'
-                sh 'cp /root/kubectl/kubectl basics/'
-
-		        sh 'cp /root/terraform/terraform emptydb/'
-                sh 'cp /root/kubectl/kubectl emptydb/'
-
-            }
-        }
         stage('Terraform Initialization') {
             steps {
                 dir('basics') {
-			        sh "./terraform init"
+			        sh "terraform init"
                 }
                 dir('emptydb') {
-			        sh "./terraform init"
+			        sh "terraform init"
                 }
             }
         }
@@ -46,17 +32,17 @@ pipeline {
                 stage("Basics") {
                     steps {
                     	dir('basics') {
-                            sh('./terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                            sh "./kubectl wait --for=condition=ready --timeout=2000s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
-			    sh('./kubectl exec -n integration-test integration-basics-$BUILD_ID -c backend -- python manage.py initdb')
+                            sh('terraform apply -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+                            sh "kubectl wait --for=condition=ready --timeout=2000s -n integration-test pod/integration-basics-${env.BUILD_ID}" 
+			                sh('kubectl exec -n integration-test integration-basics-$BUILD_ID -c backend -- python manage.py initdb')
 
-                            sh('./kubectl exec -n integration-test integration-basics-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/basics_spec.js --config-file cypress.integration.json')
+                            sh('kubectl exec -n integration-test integration-basics-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/basics_spec.js --config-file cypress.integration.json')
                         }	
                     }
 		            post {
                         always {
 			                dir('basics') {
-		                        sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+		                        sh('terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
 			                }
                     	}
                     }
@@ -64,15 +50,15 @@ pipeline {
                 stage("Empy Database") {
                     steps {
                     	dir('emptydb') {
-                            sh('./terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
-                            sh "./kubectl wait --for=condition=ready --timeout=2000s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
-                            sh('./kubectl exec -n integration-test integration-emptydb-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json')
+                            sh('terraform apply -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+                            sh "kubectl wait --for=condition=ready --timeout=2000s -n integration-test pod/integration-emptydb-${env.BUILD_ID}" 
+                            sh('kubectl exec -n integration-test integration-emptydb-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/empty_db_spec.js --config-file cypress.integration.json')
                         }
                     }
                     post {
                        	always {
 				            dir('emptydb') {
-				                sh('./terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+				                sh('terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
 				            }
                     	}
                     }
