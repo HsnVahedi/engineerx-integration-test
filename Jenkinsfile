@@ -10,6 +10,8 @@ pipeline {
         string(name: 'FRONTEND_VERSION', defaultValue: 'latest')
     }
     environment {
+        ACCESS_KEY_ID = credentials('aws-access-key-id')
+        SECRET_KEY = credentials('aws-secret-key')
         DOCKERHUB_CRED = credentials('dockerhub-repo')
         CYPRESS_KEY = credentials('cypress-key')
         BACKEND_VERSION = "${params.BACKEND_VERSION}"
