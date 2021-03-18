@@ -21,13 +21,13 @@ resource "kubernetes_pod" "integration" {
 
       resources {
         limits = {
-          cpu    = "3000m"
+          cpu    = "1500m"
           memory = "2048Mi"
         }
 
         requests = {
           memory = "1024Mi"
-          cpu    = "1200m"
+          cpu    = "1000m"
         }
       }
     }
