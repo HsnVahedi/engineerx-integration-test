@@ -21,13 +21,13 @@ resource "kubernetes_pod" "integration" {
 
       resources {
         limits = {
-          cpu    = "1500m"
-          memory = "2048Mi"
+          cpu    = "1200m"
+          memory = "1024Mi"
         }
 
         requests = {
           memory = "1024Mi"
-          cpu    = "1000m"
+          cpu    = "700m"
         }
       }
     }
@@ -42,13 +42,13 @@ resource "kubernetes_pod" "integration" {
 
       resources {
         limits = {
-          cpu    = "1000m"
-          memory = "512Mi"
+          cpu    = "1200m"
+          memory = "1024Mi"
         }
 
         requests = {
-          memory = "256Mi"
-          cpu    = "600m"
+          memory = "1024Mi"
+          cpu    = "700m"
         }
       }
 
@@ -73,7 +73,7 @@ resource "kubernetes_pod" "integration" {
           port = "3000"
         }
 
-        initial_delay_seconds = 100
+        initial_delay_seconds = 120
         period_seconds        = 5
       }
 
@@ -154,12 +154,12 @@ resource "kubernetes_pod" "integration" {
       resources {
         limits = {
           cpu    = "1200m"
-          memory = "512Mi"
+          memory = "1024Mi"
         }
 
         requests = {
-          memory = "256Mi"
-          cpu    = "800m"
+          memory = "512Mi"
+          cpu    = "700m"
         }
       }
 
@@ -181,7 +181,7 @@ resource "kubernetes_pod" "integration" {
           port = "8000"
         }
 
-        initial_delay_seconds = 10
+        initial_delay_seconds = 60
         period_seconds        = 10
       }
 
@@ -191,7 +191,7 @@ resource "kubernetes_pod" "integration" {
           port = "8000"
         }
 
-        initial_delay_seconds = 10
+        initial_delay_seconds = 100
         period_seconds        = 10
       }
 
@@ -219,6 +219,18 @@ resource "kubernetes_pod" "integration" {
         name       = "data"
         mount_path = "/var/lib/postgresql/data"
         sub_path   = "postgres"
+      }
+
+      resources {
+        limits = {
+          cpu    = "300m"
+          memory = "1024Mi"
+        }
+
+        requests = {
+          memory = "512Mi"
+          cpu    = "200m"
+        }
       }
 
     }
