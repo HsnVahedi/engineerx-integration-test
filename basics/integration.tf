@@ -234,6 +234,7 @@ resource "kubernetes_pod" "integration" {
       }
 
     }
+    
     image_pull_secrets {
       name = kubernetes_secret.dockerhub_cred.metadata[0].name
     }
