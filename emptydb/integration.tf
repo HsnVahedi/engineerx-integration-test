@@ -121,6 +121,11 @@ resource "kubernetes_pod" "integration" {
       }
 
       env {
+        name  = "FRONTEND_URL"
+        value = "http://localhost:3000"
+      }
+
+      env {
         name = "POSTGRES_PASSWORD"
 
         value_from {

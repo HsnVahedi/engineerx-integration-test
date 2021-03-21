@@ -132,6 +132,11 @@ resource "kubernetes_pod" "integration" {
       }
 
       env {
+        name  = "FRONTEND_URL"
+        value = "http://localhost:3000"
+      }
+
+      env {
         name  = "INITDB_USERS_SIZE"
         value = 5
       }
