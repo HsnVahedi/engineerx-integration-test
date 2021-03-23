@@ -43,6 +43,9 @@ pipeline {
                 dir('emptydb') {
 			        sh "terraform init"
                 }
+                dir('pagination') {
+			        sh "terraform init"
+                }
             }
         }
         stage('Deploy Integration Tests') {
@@ -65,6 +68,24 @@ pipeline {
                     	}
                     }
                 }
+                stage("Pagination") {
+                    steps {
+                    	dir('pagination') {
+                            sh('terraform apply -var test_name=pagination -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+                            sh "kubectl wait --for=condition=ready --timeout=2000s -n integration-test pod/integration-pagination-${env.BUILD_ID}" 
+			                sh('kubectl exec -n integration-test integration-pagination-$BUILD_ID -c backend -- python manage.py initdb')
+
+                            sh('kubectl exec -n integration-test integration-pagination-$BUILD_ID -c cypress -- npx cypress run --record --key $CYPRESS_KEY --spec cypress/integration/pagination_spec.js --config-file cypress.integration.json')
+                        }	
+                    }
+		            post {
+                        always {
+			                dir('pagination') {
+		                        sh('terraform destroy -var test_name=pagination -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+			                }
+                    	}
+                    }
+                }
                 stage("Empy Database") {
                     steps {
                     	dir('emptydb') {
@@ -76,7 +97,7 @@ pipeline {
                     post {
                        	always {
 				            dir('emptydb') {
-				                sh('terraform destroy -var test_name=basics -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
+				                sh('terraform destroy -var test_name=emptydb -var test_number=$BUILD_ID -var backend_version=$BACKEND_VERSION -var frontend_version=$FRONTEND_VERSION -var dockerhub_username=$DOCKERHUB_CRED_USR -var dockerhub_password=$DOCKERHUB_CRED_PSW --auto-approve')
 				            }
                     	}
                     }
