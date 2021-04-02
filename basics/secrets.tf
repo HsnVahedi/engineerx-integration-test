@@ -14,7 +14,7 @@ resource "kubernetes_secret" "postgres_password" {
 
 resource "kubernetes_secret" "django_secret_key" {
   metadata {
-    name = "django-secret-key"
+    name = "django-secret-key-${var.test_name}-${var.test_number}"
     namespace = "backend-test"
     labels = {
       role = "backend-test"
