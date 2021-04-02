@@ -12,6 +12,20 @@ resource "kubernetes_secret" "postgres_password" {
   }
 }
 
+resource "kubernetes_secret" "django_secret_key" {
+  metadata {
+    name = "django-secret-key"
+    namespace = "backend-test"
+    labels = {
+      role = "backend-test"
+    }
+  }
+
+  data = {
+    secret_key = "lksd;flkjasd;lfkajdfhuqkl4848400nvc" 
+  }
+}
+
 resource "kubernetes_secret" "dockerhub_cred" {
   metadata {
     name = "dockerhub-cred-${var.test_name}-${var.test_number}"
