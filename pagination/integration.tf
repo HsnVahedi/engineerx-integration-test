@@ -132,8 +132,24 @@ resource "kubernetes_pod" "integration" {
       }
 
       env {
+        name = "SECRET_KEY"
+
+        value_from {
+          secret_key_ref {
+            name = kubernetes_secret.django_secret_key.metadata[0].name
+            key  = "secret_key"
+          }
+        }
+      }
+
+      env {
         name  = "FRONTEND_URL"
         value = "http://localhost:3000"
+      }
+
+      env {
+        name  = "ALLOWED_HOST"
+        value = "*"
       }
 
       env {

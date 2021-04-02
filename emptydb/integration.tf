@@ -126,12 +126,28 @@ resource "kubernetes_pod" "integration" {
       }
 
       env {
+        name  = "ALLOWED_HOST"
+        value = "*"
+      }
+
+      env {
         name = "POSTGRES_PASSWORD"
 
         value_from {
           secret_key_ref {
             name = kubernetes_secret.postgres_password.metadata[0].name
             key  = "password"
+          }
+        }
+      }
+
+      env {
+        name = "SECRET_KEY"
+
+        value_from {
+          secret_key_ref {
+            name = kubernetes_secret.django_secret_key.metadata[0].name
+            key  = "secret_key"
           }
         }
       }
